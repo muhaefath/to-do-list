@@ -3,10 +3,39 @@
 package main
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/gofiber/fiber/v2"
+	_ "github.com/lib/pq"
+	"github.com/muhaefath/to-do-list/config"
+	"github.com/muhaefath/to-do-list/database"
 )
 
 func main() {
+	config, err := config.LoadConfig("config.yaml")
+	if err != nil {
+		log.Fatalf("Error loading config: %v", err)
+	}
+
+	// Access configuration values
+	port := config.Port
+	logLevel := config.LogLevel
+	dbHost := config.Database.Host
+	// Access other configuration values similarly...
+
+	// Now you can use these values in your application
+	log.Printf("Server is running on port %d\n", port)
+	log.Printf("Log level: %s\n", logLevel)
+	log.Printf("Database host: %s\n", dbHost)
+
+	// Establish database connection
+	db, err := database.ConnectDB(config)
+	if err != nil {
+		log.Fatalf("Error connecting to database: %v", err)
+	}
+	defer db.Close()
+
 	// Create a new Fiber instance
 	app := fiber.New()
 
@@ -16,5 +45,5 @@ func main() {
 	})
 
 	// Start the server
-	app.Listen(":3000")
+	app.Listen(fmt.Sprintf(":%d", port))
 }
