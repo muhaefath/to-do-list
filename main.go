@@ -10,6 +10,8 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/muhaefath/to-do-list/config"
 	"github.com/muhaefath/to-do-list/database"
+	"github.com/muhaefath/to-do-list/internals/repository"
+	"github.com/muhaefath/to-do-list/router"
 )
 
 func main() {
@@ -43,6 +45,9 @@ func main() {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
+
+	todoRepo := repository.NewTodoListRepository(db)
+	router.SetupRoutes(app, *todoRepo)
 
 	// Start the server
 	app.Listen(fmt.Sprintf(":%d", port))
