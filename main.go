@@ -11,6 +11,8 @@ import (
 	"github.com/muhaefath/to-do-list/config"
 	"github.com/muhaefath/to-do-list/database"
 	"github.com/muhaefath/to-do-list/internals/repository"
+	"github.com/muhaefath/to-do-list/internals/repository/product"
+	"github.com/muhaefath/to-do-list/migrations"
 	"github.com/muhaefath/to-do-list/router"
 )
 
@@ -38,6 +40,12 @@ func main() {
 	}
 	defer db.Close()
 
+	migrationsDir := "migrations"
+	MigrateErr := migrations.Migrate(db, migrationsDir)
+	if MigrateErr != nil {
+		log.Fatalf("Error applying migrations: %v", MigrateErr)
+	}
+
 	// Create a new Fiber instance
 	app := fiber.New()
 
@@ -47,7 +55,10 @@ func main() {
 	})
 
 	todoRepo := repository.NewTodoListRepository(db)
-	router.SetupRoutes(app, *todoRepo)
+	productRepo := product.NewProductRepository(db)
+	orderRepo := repository.NewOrderRepository(db)
+
+	router.SetupRoutes(app, *todoRepo, orderRepo, productRepo)
 
 	// Start the server
 	app.Listen(fmt.Sprintf(":%d", port))

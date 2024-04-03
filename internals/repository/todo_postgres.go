@@ -19,7 +19,6 @@ func NewTodoListRepository(db *sql.DB) *TodoListRepository {
 	return &TodoListRepository{db: db}
 }
 
-// GetAll retrieves all to-do items from the database
 func (r *TodoListRepository) GetAll() ([]models.Todo, error) {
 	rows, err := r.db.Query("SELECT id, title, completed FROM todolist")
 	if err != nil {
@@ -44,7 +43,6 @@ func (r *TodoListRepository) GetAll() ([]models.Todo, error) {
 	return todoList, nil
 }
 
-// GetAll retrieves all to-do items from the database
 func (r *TodoListRepository) GetByID(id string) (*models.Todo, error) {
 	rows, err := r.db.Query("SELECT id, title, completed FROM todolist WHERE id = $1", id)
 	if err != nil {

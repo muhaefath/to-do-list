@@ -8,36 +8,29 @@ import (
 )
 
 func TestTodoListRepository_GetAll(t *testing.T) {
-	// Create a new mock DB and a SQLMock object
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("An error '%s' was not expected when opening a stub database connection", err)
 	}
 	defer db.Close()
 
-	// Initialize TodoListRepository with mock database connection
 	repo := NewTodoListRepository(db)
 
-	// Mock data
 	expectedTodos := []models.Todo{
 		{ID: "1", Title: "Task 1", Completed: false},
 		{ID: "2", Title: "Task 2", Completed: true},
-		// Add more mock data as needed
 	}
 
-	// Define the expected query and result
 	mock.ExpectQuery("SELECT id, title, completed FROM todolist").
 		WillReturnRows(sqlmock.NewRows([]string{"id", "title", "completed"}).
 			AddRow(expectedTodos[0].ID, expectedTodos[0].Title, expectedTodos[0].Completed).
 			AddRow(expectedTodos[1].ID, expectedTodos[1].Title, expectedTodos[1].Completed))
 
-	// Call the GetAll method
 	todos, err := repo.GetAll()
 	if err != nil {
 		t.Fatalf("Error calling GetAll: %v", err)
 	}
 
-	// Check if the returned todos match the expected todos
 	if len(todos) != len(expectedTodos) {
 		t.Fatalf("Expected %d todos, got %d", len(expectedTodos), len(todos))
 	}

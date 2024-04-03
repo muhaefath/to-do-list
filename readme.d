@@ -1,0 +1,1 @@
+mockery --dir=internal/reository --name=ProductRepositoryInterface --filename=interface.go --output=internal/mocks/repomocks  --outpkg=repomocks

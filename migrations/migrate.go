@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -14,7 +15,13 @@ func Migrate(db *sql.DB, migrationsDir string) error {
 		return err
 	}
 
-	for _, file := range files {
+	for idx, file := range files {
+		if idx == len(files)-1 {
+			continue
+		}
+
+		fmt.Println("file: ", file)
+
 		if file.IsDir() {
 			continue
 		}
@@ -22,11 +29,15 @@ func Migrate(db *sql.DB, migrationsDir string) error {
 		migrationFilePath := filepath.Join(migrationsDir, file.Name())
 		migrationFile, err := ioutil.ReadFile(migrationFilePath)
 		if err != nil {
+			fmt.Println("err2: ", err)
+
 			return err
 		}
 
 		_, err = db.Exec(string(migrationFile))
 		if err != nil {
+			fmt.Println("err3: ", err)
+
 			return err
 		}
 
